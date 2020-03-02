@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, TextComponent } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-export default class Login extends Component {
+export default class Cadastro extends Component {
     constructor() {
         super()
         this.state = {
@@ -11,19 +11,40 @@ export default class Login extends Component {
         }
     }
 
-    entrar = event => {
-       if(!this.validar()) return
-    }
+    cadastrar = async e => {
+        if(!this.validar()) return
+        console.log('enviando...')
 
-    cadastrar = event => {
-        this.props.navigation.navigate('Cadastro')
+        const {email,senha} = this.state
+
+        const params ={
+            method:'POST',
+            headers:{
+                'Content-type':'application/json'
+            },
+            body: JSON.stringify({
+                email:email,
+                senha:senha,
+                nome:'Wallace',
+                sexo:'M',
+                cpf:'545151616'
+            })
+        }
+        try{
+            const retorno = await fetch('http://10.107.144.64:3000/registrar', params)
+            console.log(JSON.stringify(retorno))
+        }catch(e){
+            console.log(e)
+        }
     }
 
     validar = () => {
         const {email,senha} = this.state
         if(!email || !senha){
             Alert.alert('Ops...','Todos os campos são obrigadorios')
+            return false
         }
+        return true
     }
 
     render() {
@@ -47,11 +68,7 @@ export default class Login extends Component {
                             placeholder='Sua senha' 
                             onChangeText={texto => this.setState({senha:texto}) }  />
 
-                            <TouchableOpacity style={styles.button}>
-                                <Text>Entrar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.button}
-                                onPress={this.cadastrar}>
+                            <TouchableOpacity style={styles.button} onPress={this.cadastrar}>
                                 <Text>Cadastrar</Text>
                             </TouchableOpacity>
                         </View>

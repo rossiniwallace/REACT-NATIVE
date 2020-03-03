@@ -1,63 +1,78 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, TextComponent } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { isSignedIn, signIn } from '../servers/auth-service'
 
 export default class Login extends Component {
     constructor() {
-        super()
-        this.state = {
-            email: '',
-            senha: ''
-        }
-    }
+		super()
+		this.state = {
+			email: '',
+			senha: ''
+		}
+	}
 
-    entrar = event => {
-       if(!this.validar()) return
-    }
+	componentDidMount = async () => {
+		// const session = await isSignedIn()
+		// if(session)
+		// 	this.props.navigation.replace('Home')
+	}
 
-    cadastrar = event => {
-        this.props.navigation.navigate('Cadastro')
-    }
+	entrar = async e => {
+		if(!this.validar()) return
 
-    validar = () => {
-        const {email,senha} = this.state
-        if(!email || !senha){
-            Alert.alert('Ops...','Todos os campos são obrigadorios')
-        }
-    }
+		const usuario = this.state
+
+		const response = await signIn(usuario)
+
+		if(response.ok)
+			this.props.navigation.replace('Home')
+	}
+
+	cadastrar = e => {
+		this.props.navigation.navigate('Cadastro')
+	}
+
+	validar = () => {
+		const {email, senha} = this.state
+		if(!email || !senha){
+			Alert.alert('Ops...', 'Todos os campos são obrigatórios')
+			return false
+		}
+		return true	
+	}
+
 
     render() {
         return (
-           
-                <LinearGradient
-                    colors={["#00e676", "#009688"]}
-                    style={{ flex: 1 }}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 0, y: 1 }}>
-                    <View style={styles.container}>
-                        <View style={styles.form}>
-                            {/* <Text style={styles.titulo}>Tela de Login</Text> */}
-                            <TextInput 
-                            style={styles.input} 
-                            placeholder='Seu email' 
-                            onChangeText={texto => this.setState({email:texto})} />
 
-                            <TextInput 
-                            style={styles.input} 
-                            placeholder='Sua senha' 
-                            onChangeText={texto => this.setState({senha:texto}) }  />
-
-                            <TouchableOpacity style={styles.button}>
-                                <Text>Entrar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.button}
-                                onPress={this.cadastrar}>
-                                <Text>Cadastrar</Text>
-                            </TouchableOpacity>
-                        </View>
+            <LinearGradient
+                colors={["#00e676", "#009688"]}
+                style={{ flex: 1 }}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}>
+                <View style={styles.container}>
+                    <View style={styles.form}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Seu e-mail"
+                            onChangeText={texto => this.setState({ email: texto })} />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Sua senha"
+                            onChangeText={texto => this.setState({ senha: texto })} />
+                        <TouchableOpacity style={styles.button}
+                            onPress={this.entrar}>
+                            <Text>Entrar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.button}
+                            onPress={this.cadastrar}>
+                            <Text>Cadastrar-se</Text>
+                        </TouchableOpacity>
                     </View>
-                </LinearGradient>
-          
+                </View>
+            </LinearGradient>
+
         );
     }
 }
@@ -86,7 +101,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         fontSize: 16,
         borderRadius: 8,
-        borderWidth:2
+        borderWidth: 2
     },
     button: {
         alignSelf: 'stretch',
@@ -96,6 +111,6 @@ const styles = StyleSheet.create({
         marginTop: 16,
         padding: 8,
         borderRadius: 8,
-        borderWidth:2
+        borderWidth: 2
     }
 })

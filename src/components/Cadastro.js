@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, TextComponent } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, AsyncStorage } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+
+import {cadastrar as SignUp} from '../servers/auth-service';
 
 export default class Cadastro extends Component {
     constructor() {
@@ -12,36 +14,26 @@ export default class Cadastro extends Component {
     }
 
     cadastrar = async e => {
-        if(!this.validar()) return
+        if (!this.validar()) return
         console.log('enviando...')
 
-        const {email,senha} = this.state
+        const usuario = this.state
+        usuario.nome = 'Wallace'
+        usuario.sexo = 'M'
+        usuario.cpf  = '123546987'
 
-        const params ={
-            method:'POST',
-            headers:{
-                'Content-type':'application/json'
-            },
-            body: JSON.stringify({
-                email:email,
-                senha:senha,
-                nome:'Wallace',
-                sexo:'M',
-                cpf:'545151616'
-            })
-        }
-        try{
-            const retorno = await fetch('http://10.107.144.64:3000/registrar', params)
-            console.log(JSON.stringify(retorno))
-        }catch(e){
-            console.log(e)
-        }
+       const response = await SignUp(usuario)
+
+       if(!response.ok)
+       return Alert.alert('Erro ao cadastrar')
+
+		this.props.navigation.navigate('Home')
     }
 
     validar = () => {
-        const {email,senha} = this.state
-        if(!email || !senha){
-            Alert.alert('Ops...','Todos os campos são obrigadorios')
+        const { email, senha } = this.state
+        if (!email || !senha) {
+            Alert.alert('Ops...', 'Todos os campos são obrigadorios')
             return false
         }
         return true
@@ -49,32 +41,32 @@ export default class Cadastro extends Component {
 
     render() {
         return (
-           
-                <LinearGradient
-                    colors={["#00e676", "#009688"]}
-                    style={{ flex: 1 }}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 0, y: 1 }}>
-                    <View style={styles.container}>
-                        <View style={styles.form}>
-                            {/* <Text style={styles.titulo}>Tela de Login</Text> */}
-                            <TextInput 
-                            style={styles.input} 
-                            placeholder='Seu email' 
-                            onChangeText={texto => this.setState({email:texto})} />
 
-                            <TextInput 
-                            style={styles.input} 
-                            placeholder='Sua senha' 
-                            onChangeText={texto => this.setState({senha:texto}) }  />
+            <LinearGradient
+                colors={["#00e676", "#009688"]}
+                style={{ flex: 1 }}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}>
+                <View style={styles.container}>
+                    <View style={styles.form}>
+                        {/* <Text style={styles.titulo}>Tela de Login</Text> */}
+                        <TextInput
+                            style={styles.input}
+                            placeholder='Seu email'
+                            onChangeText={texto => this.setState({ email: texto })} />
 
-                            <TouchableOpacity style={styles.button} onPress={this.cadastrar}>
-                                <Text>Cadastrar</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <TextInput
+                            style={styles.input}
+                            placeholder='Sua senha'
+                            onChangeText={texto => this.setState({ senha: texto })} />
+
+                        <TouchableOpacity style={styles.button} onPress={this.cadastrar}>
+                            <Text>Cadastrar</Text>
+                        </TouchableOpacity>
                     </View>
-                </LinearGradient>
-          
+                </View>
+            </LinearGradient>
+
         );
     }
 }
@@ -103,7 +95,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         fontSize: 16,
         borderRadius: 8,
-        borderWidth:2
+        borderWidth: 2
     },
     button: {
         alignSelf: 'stretch',
@@ -113,6 +105,6 @@ const styles = StyleSheet.create({
         marginTop: 16,
         padding: 8,
         borderRadius: 8,
-        borderWidth:2
+        borderWidth: 2
     }
 })
